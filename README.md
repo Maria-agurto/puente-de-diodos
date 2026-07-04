@@ -16,9 +16,9 @@ El **Simulador de Rectificación Web** es una herramienta interactiva y educativ
 
 El objetivo es que el usuario pueda **observar de forma clara y didáctica** cómo la corriente alterna (AC) se transforma en corriente continua (DC), identificando visualmente:
 
-- 🔀 La conmutación de los diodos según el semiciclo activo.
-- 🌊 El flujo de corriente a través del circuito.
-- 📈 Las gráficas de voltaje/corriente en tiempo real.
+- La conmutación de los diodos según el semiciclo activo.
+- El flujo de corriente a través del circuito.
+- Las gráficas de voltaje/corriente en tiempo real.
 
 ### Arquitectura
 

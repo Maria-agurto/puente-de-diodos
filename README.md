@@ -76,7 +76,7 @@ Este proyecto **no requiere instalación, dependencias ni servidor**. Para ejecu
 
 3. **Hacer doble clic** en el archivo `index.html`.
 
-4. ¡Listo! El simulador se abrirá automáticamente en tu navegador predeterminado.
+4. El simulador se abrirá automáticamente en tu navegador predeterminado.
 
 > Compatible con cualquier navegador web moderno: **Chrome, Edge o Firefox**.
 

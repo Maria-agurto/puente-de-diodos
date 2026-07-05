@@ -18,6 +18,15 @@
 let chartInstancia = null;
 let ultimasMetricas = null;
 
+// --- Estado del "barrido" en vivo de la gráfica (estilo osciloscopio) ---
+// La onda no se queda fija: su fase avanza con el mismo reloj lento que ya
+// usa animation.js para los semiciclos (1s por semiciclo == PI rad / 1000ms),
+// así que la velocidad de la onda en pantalla NO depende de la frecuencia
+// que escribe el usuario (esa regla es la misma que ya rige el semáforo de
+// diodos), solo su FORMA (cuántos ciclos caben en la ventana) depende de ella.
+let faseAcumuladaRad = 0;
+let ultimoTsGrafica = null;
+
 // Plugin propio de Chart.js: dibuja una línea vertical que indica
 // en qué punto del ciclo está la animación en este instante.
 const PLUGIN_MARCADOR_SEMICICLO = {
@@ -57,6 +66,10 @@ function inicializarGrafica(estado) {
         return null;
     }
 
+    // Cada (re)dibujo completo arranca el barrido desde fase 0.
+    faseAcumuladaRad = 0;
+    ultimoTsGrafica = null;
+
     const voltajePico = estado.voltajeUsuario;
     const frecuencia = estado.frecuenciaUsuario;
     const resistenciaOhm = estado.resistenciaKOhm * 1000;
@@ -74,7 +87,7 @@ function inicializarGrafica(estado) {
 
     // Puntos {x,y} en milisegundos para poder usar un eje X numérico
     // (necesario para posicionar el marcador de sincronía con precisión).
-    const puntos = (serie) => entrada.tiempos.map((t, i) => ({ x: t * 1000, y: serie[i] }));
+    const puntos = (serie) => puntosDesdeSerie(entrada.tiempos, serie);
 
     if (chartInstancia) {
         chartInstancia.destroy();
@@ -144,6 +157,73 @@ function inicializarGrafica(estado) {
     actualizarPanelInformacion(estado, ultimasMetricas);
 
     return chartInstancia;
+}
+
+/**
+ * Convierte una serie de valores a puntos {x,y} en milisegundos, listos
+ * para Chart.js (eje X numérico, necesario para el marcador de sincronía).
+ */
+function puntosDesdeSerie(tiempos, serie) {
+    return tiempos.map((t, i) => ({ x: t * 1000, y: serie[i] }));
+}
+
+/**
+ * Recalcula únicamente las 3 ondas (con la fase acumulada actual) y las
+ * vuelca en el chart ya existente, sin reconstruirlo — así el "barrido"
+ * es fluido y barato en cada frame.
+ */
+function actualizarOndaEnMovimiento() {
+    if (!chartInstancia) return;
+
+    const estado = EstadoSimulacion;
+    const voltajePico = estado.voltajeUsuario;
+    const frecuencia = estado.frecuenciaUsuario;
+    const resistenciaOhm = estado.resistenciaKOhm * 1000;
+    const capacitanciaFaradios = estado.condensadorUF * 1e-6;
+
+    const entrada = generarOndaEntrada(voltajePico, frecuencia, 200, faseAcumuladaRad);
+    const rectificada = generarOndaRectificada(voltajePico, frecuencia, 200, faseAcumuladaRad);
+    const filtrada = generarOndaFiltrada(entrada.tiempos, rectificada, resistenciaOhm, capacitanciaFaradios);
+
+    const mitad = Math.floor(filtrada.length / 2);
+    ultimasMetricas = calcularMetricasSalida(filtrada.slice(mitad), resistenciaOhm);
+
+    chartInstancia.data.datasets[0].data = puntosDesdeSerie(entrada.tiempos, entrada.datos);
+    chartInstancia.data.datasets[1].data = puntosDesdeSerie(entrada.tiempos, rectificada);
+    chartInstancia.data.datasets[2].data = puntosDesdeSerie(entrada.tiempos, filtrada);
+    chartInstancia.update('none'); // 'none' = sin animación propia de Chart.js (nosotros ya controlamos el movimiento)
+
+    actualizarPanelInformacion(estado, ultimasMetricas);
+}
+
+/**
+ * Bucle propio (independiente del de animation.js) que hace avanzar la
+ * fase de la onda mientras la simulación está corriendo. Usa el MISMO
+ * reloj lento (tiempoMinimoSemicicloMs) que ya obliga a que cada semiciclo
+ * dure 1s, así que la gráfica y el semáforo de diodos quedan sincronizados
+ * en velocidad, sin depender del reloj real del navegador más que para
+ * medir el delta de cada frame.
+ */
+function bucleGrafica(timestampActual) {
+    if (EstadoSimulacion.corriendo) {
+        if (ultimoTsGrafica === null) {
+            ultimoTsGrafica = timestampActual;
+        }
+        const deltaMs = timestampActual - ultimoTsGrafica;
+        ultimoTsGrafica = timestampActual;
+
+        const tiempoSemicicloMs = (typeof SimuladorConfig !== 'undefined' && SimuladorConfig.reglasEvaluacion)
+            ? SimuladorConfig.reglasEvaluacion.tiempoMinimoSemicicloMs
+            : 1000;
+
+        // Medio periodo (PI rad) debe tardar exactamente tiempoSemicicloMs.
+        faseAcumuladaRad += (Math.PI / tiempoSemicicloMs) * deltaMs;
+
+        actualizarOndaEnMovimiento();
+    } else {
+        ultimoTsGrafica = null; // evita un salto de fase al reanudar
+    }
+    requestAnimationFrame(bucleGrafica);
 }
 
 /**
@@ -254,6 +334,11 @@ document.addEventListener('semicicloCambio', function (e) {
 });
 
 document.addEventListener('DOMContentLoaded', inicializarTooltips);
+document.addEventListener('DOMContentLoaded', function () {
+    // El bucle vive todo el tiempo; internamente solo avanza la fase
+    // mientras EstadoSimulacion.corriendo === true (ver bucleGrafica).
+    requestAnimationFrame(bucleGrafica);
+});
 
 // API pública para que animation.js dispare el (re)dibujo al
 // presionar "Iniciar" o "Reiniciar", con los valores más recientes.

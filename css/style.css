@@ -27,6 +27,8 @@
   --gray-line:     #aab4c4;   /* líneas neutras sobre fondo oscuro */
   --green-active:  #22ff88;   /* estado activo (diodo-activo) */
   --green-deep:    #0f9d58;   /* verde de soporte para botón iniciar */
+  --led-on:        #ef4444;   /* LED de diodo conduciendo (rojo) */
+  --led-off:       #3b82f6;   /* LED de diodo en corte (azul) */
   --white:         #ffffff;
   --ink:           #0f1729;   /* texto principal */
 
@@ -393,8 +395,35 @@ svg text {
 }
 
 .xfmr-core {
-  stroke: var(--gray-line);
+  stroke: var(--blue-trace);
   stroke-width: 3;
+}
+
+/* --- Fuente de CA: círculo + onda senoidal (ícono de frecuencia) --- */
+.ac-circle {
+  fill: rgba(61, 123, 255, 0.06);
+  stroke: var(--blue-trace);
+  stroke-width: 2;
+}
+
+.ac-sine {
+  fill: none;
+  stroke: var(--blue-trace);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+/* --- Voltímetro: círculo + "V" (ícono de voltaje) --- */
+.voltmeter-circle {
+  fill: rgba(61, 123, 255, 0.06);
+  stroke: var(--blue-trace);
+  stroke-width: 2;
+}
+
+.voltmeter-text {
+  fill: var(--blue-trace);
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .diode-lead {
@@ -404,20 +433,15 @@ svg text {
 
 .diode-triangle {
   fill: rgba(61, 123, 255, 0.14);
-  stroke: var(--gray-line);
+  stroke: var(--blue-trace);
   stroke-width: 1.6;
   stroke-linejoin: round;
   transition: fill 0.3s ease, stroke 0.3s ease;
 }
 
-.diode-bar,
-.diode-bar-guide {
-  stroke: var(--gray-line);
+.diode-bar {
+  stroke: var(--blue-trace);
   stroke-width: 2.5;
-}
-
-.diode-bar-guide {
-  opacity: 0;
 }
 
 .cap-lead,
@@ -427,13 +451,13 @@ svg text {
 }
 
 .cap-plate {
-  stroke: var(--gray-line);
+  stroke: var(--blue-trace);
   stroke-width: 3.5;
 }
 
 .res-body {
   fill: none;
-  stroke: var(--gray-line);
+  stroke: var(--blue-trace);
   stroke-width: 2.5;
   stroke-linejoin: round;
 }
@@ -458,6 +482,20 @@ svg text {
   font-size: 10px;
 }
 
+.label-text--diode {
+  fill: #dbe4f5;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* --- LED indicador de cada diodo: azul = en corte, rojo = conduciendo --- */
+.diode-led {
+  fill: var(--led-off);
+  stroke: #0b1220;
+  stroke-width: 1.5;
+  transition: fill 0.25s ease, filter 0.25s ease;
+}
+
 /* Componentes reciben un leve realce al pasar el cursor,
    anticipando los tooltips que integrará el Integrante 3 */
 .component:hover .diode-triangle,
@@ -476,20 +514,26 @@ svg text {
    ================================================================ */
 
 .diodo-activo .diode-triangle {
-  fill: var(--green-active);
-  stroke: var(--green-active);
-  filter: drop-shadow(0 0 6px var(--green-active));
+  fill: var(--led-on);
+  stroke: var(--led-on);
+  filter: drop-shadow(0 0 6px var(--led-on));
   animation: diodo-pulso 1s ease-in-out infinite alternate;
 }
 
 .diodo-activo .diode-bar {
-  stroke: var(--green-active);
-  filter: drop-shadow(0 0 4px var(--green-active));
+  stroke: var(--led-on);
+  filter: drop-shadow(0 0 4px var(--led-on));
+}
+
+.diodo-activo .diode-led {
+  fill: var(--led-on);
+  filter: drop-shadow(0 0 8px var(--led-on));
+  animation: diodo-pulso 1s ease-in-out infinite alternate;
 }
 
 @keyframes diodo-pulso {
-  from { filter: drop-shadow(0 0 4px var(--green-active)); }
-  to   { filter: drop-shadow(0 0 10px var(--green-active)); }
+  from { filter: drop-shadow(0 0 4px var(--led-on)); }
+  to   { filter: drop-shadow(0 0 10px var(--led-on)); }
 }
 
 /* --- Alternancia de polaridad del transformador (regla estricta) --- */
@@ -528,7 +572,12 @@ svg text {
 #resistencia-visual.flujo-activo .res-lead {
   stroke: var(--green-active);
   filter: drop-shadow(0 0 5px var(--green-active));
-  animation: diodo-pulso 1s ease-in-out infinite alternate;
+  animation: flujo-pulso 1s ease-in-out infinite alternate;
+}
+
+@keyframes flujo-pulso {
+  from { filter: drop-shadow(0 0 4px var(--green-active)); }
+  to   { filter: drop-shadow(0 0 10px var(--green-active)); }
 }
 
 
@@ -649,6 +698,7 @@ svg text {
 
 @media (prefers-reduced-motion: reduce) {
   .diodo-activo .diode-triangle,
+  .diodo-activo .diode-led,
   #resistencia-visual.flujo-activo .res-body {
     animation: none;
   }

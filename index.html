@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador de Rectificación de Onda Completa</title>
+
+  <!-- Tipografías: Space Grotesk (display técnico) + JetBrains Mono (lecturas de instrumento) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER — Barra superior de instrumento de laboratorio
+       ============================================================ -->
+  <header class="app-header">
+    <div class="app-header__brand">
+      <span class="app-header__eyebrow">Laboratorio de Electrónica &mdash; Módulo 04</span>
+      <h1 class="app-header__title">Simulador de Rectificación de Onda Completa</h1>
+      <p class="app-header__subtitle">Puente de diodos &middot; Filtro capacitivo &middot; Análisis de ripple en tiempo real</p>
+    </div>
+    <div class="app-header__status" aria-hidden="true">
+      <span class="status-dot"></span>
+      <span class="status-text">EN ESPERA</span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN — Contenedor principal: panel izq / centro / der
+       ============================================================ -->
+  <main class="workbench">
+
+    <!-- ========================= PANEL IZQUIERDO ========================= -->
+    <aside class="panel controls-panel" aria-label="Panel de controles">
+      <h2 class="panel__title"><span class="panel__index">01</span> Controles de Entrada</h2>
+
+      <form class="controls-form" onsubmit="return false;">
+
+        <!-- Frecuencia -->
+        <div class="field">
+          <label for="frecuencia-input">Frecuencia <span class="field__unit">(Hz)</span></label>
+          <input
+            type="number"
+            id="frecuencia-input"
+            name="frecuencia"
+            placeholder="Ej. 60"
+            value="60"
+            min="1"
+            step="1"
+          />
+        </div>
+
+        <!-- Voltaje de entrada -->
+        <div class="field">
+          <label for="voltaje-input">Voltaje de Entrada <span class="field__unit">(V)</span></label>
+          <input
+            type="number"
+            id="voltaje-input"
+            name="voltaje"
+            placeholder="Ej. 12"
+            value="12"
+            min="0"
+            step="0.1"
+          />
+        </div>
+
+        <!-- Condensador -->
+        <div class="field">
+          <label for="condensador-input">Condensador <span class="field__unit">(&micro;F)</span></label>
+          <input
+            type="number"
+            id="condensador-input"
+            name="condensador"
+            placeholder="Ej. 1000"
+            value="1000"
+            min="1"
+            step="1"
+          />
+        </div>
+
+        <!-- Resistencia -->
+        <div class="field">
+          <label for="resistencia-input">Resistencia <span class="field__unit">(k&Omega;)</span></label>
+          <input
+            type="number"
+            id="resistencia-input"
+            name="resistencia"
+            placeholder="Ej. 1"
+            value="1"
+            min="0.01"
+            step="0.01"
+          />
+        </div>
+
+        <!-- Botones de control -->
+        <div class="button-row">
+          <button type="button" id="btn-iniciar" class="btn btn--primary" aria-label="Iniciar simulación">
+            <span class="btn__icon" aria-hidden="true">&#9654;</span> Iniciar
+          </button>
+          <button type="button" id="btn-pausar" class="btn btn--secondary" aria-label="Pausar simulación">
+            <span class="btn__icon" aria-hidden="true">&#10073;&#10073;</span> Pausar
+          </button>
+          <button type="button" id="btn-reiniciar" class="btn btn--ghost" aria-label="Reiniciar simulación">
+            <span class="btn__icon" aria-hidden="true">&#8635;</span> Reiniciar
+          </button>
+        </div>
+      </form>
+    </aside>
+
+    <!-- ========================= PANEL CENTRAL ========================= -->
+    <section class="panel circuit-panel" aria-label="Diagrama del circuito">
+      <h2 class="panel__title"><span class="panel__index">02</span> Circuito Rectificador</h2>
+
+      <div class="circuit-stage">
+        <!-- ============================================================
+             SVG DEL CIRCUITO
+             IDs fijos requeridos por el contrato de integración:
+             transformador-secundario, diodo-1..4, condensador-visual,
+             resistencia-visual. Espacio y estructura preparados para
+             que el Integrante 2 aplique animation.js sobre estos nodos.
+             ============================================================ -->
+        <svg viewBox="0 0 720 420" class="circuit-svg" role="img" aria-label="Diagrama esquemático del puente rectificador de onda completa">
+
+          <!-- Cableado base -->
+          <g class="wiring" data-component="cableado" title="Cableado del circuito">
+            <!-- Secundario -> puente -->
+            <line x1="150" y1="120" x2="150" y2="180" class="wire" />
+            <line x1="150" y1="240" x2="150" y2="300" class="wire" />
+            <!-- Puente -> condensador -->
+            <line x1="330" y1="90" x2="430" y2="90" class="wire" />
+            <line x1="330" y1="330" x2="430" y2="330" class="wire" />
+            <line x1="430" y1="90" x2="430" y2="150" class="wire" />
+            <line x1="430" y1="270" x2="430" y2="330" class="wire" />
+            <!-- Condensador -> resistencia -->
+            <line x1="430" y1="90" x2="560" y2="90" class="wire" />
+            <line x1="430" y1="330" x2="560" y2="330" class="wire" />
+            <line x1="560" y1="90" x2="560" y2="150" class="wire" />
+            <line x1="560" y1="270" x2="560" y2="330" class="wire" />
+            <!-- Línea de salida a la derecha (para tooltip/animación de flujo) -->
+            <line x1="150" y1="90" x2="150" y2="120" class="wire" />
+            <line x1="150" y1="90" x2="330" y2="90"  class="wire" />
+            <line x1="150" y1="300" x2="150" y2="330" class="wire" />
+            <line x1="150" y1="330" x2="330" y2="330" class="wire" />
+          </g>
+
+          <!-- Transformador (secundario) -->
+          <g id="transformador-secundario" class="component" data-component="transformador" title="Transformador — devanado secundario">
+            <rect x="60" y="70" width="90" height="260" rx="6" class="xfmr-body" />
+            <!-- devanado primario (izquierda) -->
+            <path d="M 75 100 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20"
+                  class="xfmr-coil" />
+            <!-- devanado secundario (derecha) -->
+            <path d="M 135 100 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20"
+                  class="xfmr-coil" />
+            <!-- núcleo -->
+            <line x1="105" y1="80" x2="105" y2="320" class="xfmr-core" />
+            <line x1="112" y1="80" x2="112" y2="320" class="xfmr-core" />
+            <text x="105" y="60" class="label-text" text-anchor="middle">TRANSFORMADOR</text>
+            <text x="105" y="350" class="label-text label-text--sub" text-anchor="middle">Secundario</text>
+          </g>
+
+          <!-- Puente rectificador: 4 diodos en configuración de rombo -->
+          <g class="bridge" data-component="puente-rectificador" title="Puente rectificador de onda completa">
+
+            <!-- Diodo 1 (superior izquierdo) -->
+            <g id="diodo-1" class="diode" data-component="diodo-1" title="Diodo 1">
+              <line x1="150" y1="180" x2="240" y2="90" class="diode-lead" />
+              <polygon points="205,150 240,150 222,120" class="diode-triangle" />
+              <line x1="205" y1="150" x2="240" y2="120" class="diode-bar-guide" />
+              <line x1="240" y1="150" x2="240" y2="120" class="diode-bar" />
+              <line x1="240" y1="90" x2="330" y2="90" class="diode-lead" />
+            </g>
+
+            <!-- Diodo 2 (inferior izquierdo) -->
+            <g id="diodo-2" class="diode" data-component="diodo-2" title="Diodo 2">
+              <line x1="150" y1="240" x2="240" y2="330" class="diode-lead" />
+              <polygon points="205,270 240,270 222,300" class="diode-triangle" />
+              <line x1="240" y1="270" x2="240" y2="300" class="diode-bar" />
+              <line x1="240" y1="330" x2="330" y2="330" class="diode-lead" />
+            </g>
+
+            <!-- Diodo 3 (inferior derecho) -->
+            <g id="diodo-3" class="diode" data-component="diodo-3" title="Diodo 3">
+              <line x1="150" y1="240" x2="240" y2="240" class="diode-lead" />
+              <polygon points="240,225 240,255 275,240" class="diode-triangle" />
+              <line x1="275" y1="225" x2="275" y2="255" class="diode-bar" />
+              <line x1="275" y1="240" x2="330" y2="240" class="diode-lead" />
+            </g>
+
+            <!-- Diodo 4 (superior derecho) -->
+            <g id="diodo-4" class="diode" data-component="diodo-4" title="Diodo 4">
+              <line x1="150" y1="180" x2="240" y2="180" class="diode-lead" />
+              <polygon points="240,165 240,195 275,180" class="diode-triangle" />
+              <line x1="275" y1="165" x2="275" y2="195" class="diode-bar" />
+              <line x1="275" y1="180" x2="330" y2="180" class="diode-lead" />
+            </g>
+
+            <text x="240" y="215" class="label-text label-text--bridge" text-anchor="middle">D1&ndash;D4</text>
+          </g>
+
+          <!-- Condensador -->
+          <g id="condensador-visual" class="component" data-component="condensador" title="Condensador de filtrado">
+            <line x1="430" y1="150" x2="430" y2="185" class="cap-lead" />
+            <line x1="410" y1="185" x2="450" y2="185" class="cap-plate" />
+            <line x1="410" y1="200" x2="450" y2="200" class="cap-plate" />
+            <line x1="430" y1="200" x2="430" y2="270" class="cap-lead" />
+            <text x="430" y="140" class="label-text" text-anchor="middle">C</text>
+          </g>
+
+          <!-- Resistencia -->
+          <g id="resistencia-visual" class="component" data-component="resistencia" title="Resistencia de carga">
+            <line x1="560" y1="150" x2="560" y2="170" class="res-lead" />
+            <path d="M 560 170 l 8 8 l -16 8 l 16 8 l -16 8 l 16 8 l -8 8"
+                  class="res-body" />
+            <line x1="560" y1="218" x2="560" y2="270" class="res-lead" />
+            <text x="560" y="140" class="label-text" text-anchor="middle">R</text>
+          </g>
+
+          <!-- Nodos de salida (para lectura de Vout en tooltip futuro) -->
+          <circle cx="560" cy="90" r="4" class="node-dot" />
+          <circle cx="560" cy="330" r="4" class="node-dot" />
+        </svg>
+
+        <p class="circuit-stage__hint">El área del circuito queda reservada para las animaciones del semáforo de diodos y el flujo de corriente.</p>
+      </div>
+    </section>
+
+    <!-- ========================= PANEL DERECHO ========================= -->
+    <aside class="panel info-panel" aria-label="Información del sistema">
+      <h2 class="panel__title"><span class="panel__index">03</span> Información del Sistema</h2>
+
+      <dl class="info-list">
+        <div class="info-item">
+          <dt>Frecuencia</dt>
+          <dd><span class="info-value">60.00</span> <span class="info-unit">Hz</span></dd>
+        </div>
+        <div class="info-item">
+          <dt>Período</dt>
+          <dd><span class="info-value">16.67</span> <span class="info-unit">ms</span></dd>
+        </div>
+        <div class="info-item">
+          <dt>Voltaje Entrada</dt>
+          <dd><span class="info-value">12.00</span> <span class="info-unit">V</span></dd>
+        </div>
+        <div class="info-item">
+          <dt>Voltaje Salida</dt>
+          <dd><span class="info-value">&mdash;</span> <span class="info-unit">V</span></dd>
+        </div>
+        <div class="info-item">
+          <dt>Ripple</dt>
+          <dd><span class="info-value">&mdash;</span> <span class="info-unit">%</span></dd>
+        </div>
+        <div class="info-item">
+          <dt>Corriente</dt>
+          <dd><span class="info-value">&mdash;</span> <span class="info-unit">mA</span></dd>
+        </div>
+        <div class="info-item">
+          <dt>Potencia</dt>
+          <dd><span class="info-value">&mdash;</span> <span class="info-unit">W</span></dd>
+        </div>
+      </dl>
+
+      <p class="info-panel__hint">Los valores se completarán en tiempo real por el módulo de cálculo.</p>
+    </aside>
+
+  </main>
+
+  <!-- ============================================================
+       PARTE INFERIOR — Reserva de espacio para Chart.js
+       ============================================================ -->
+  <section class="panel graph-panel" aria-label="Gráficas de onda">
+    <h2 class="panel__title"><span class="panel__index">04</span> Formas de Onda</h2>
+    <div class="graph-canvas-wrapper">
+      <canvas id="grafica-ondas"></canvas>
+    </div>
+  </section>
+
+  <footer class="app-footer">
+    <p>Simulador de Rectificación de Onda Completa &mdash; Proyecto de Física Electrónica</p>
+  </footer>
+
+</body>
+</html>

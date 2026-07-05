@@ -77,7 +77,9 @@ function leerValoresUsuario() {
 // --- MOTOR MATEMÁTICO ---
 
 // Función para generar los datos de la onda de entrada (2 periodos completos)
-function generarOndaEntrada(voltajePico, frecuencia, puntos = 200) {
+// faseOffsetRad permite "correr" la onda en el tiempo (usado por la animación
+// en vivo de la gráfica); si no se indica, se comporta igual que antes (fase 0).
+function generarOndaEntrada(voltajePico, frecuencia, puntos = 200, faseOffsetRad = 0) {
     let datos = [];
     let etiquetas = [];
     let tiempos = [];
@@ -85,7 +87,7 @@ function generarOndaEntrada(voltajePico, frecuencia, puntos = 200) {
 
     for (let i = 0; i <= puntos; i++) {
         let t = (i / puntos) * (2 * periodo);
-        let v = voltajePico * Math.sin(2 * Math.PI * frecuencia * t);
+        let v = voltajePico * Math.sin(2 * Math.PI * frecuencia * t + faseOffsetRad);
 
         tiempos.push(t);
         datos.push(v);
@@ -95,8 +97,8 @@ function generarOndaEntrada(voltajePico, frecuencia, puntos = 200) {
 }
 
 // Función para la onda rectificada (Onda completa, antes del filtro)
-function generarOndaRectificada(voltajePico, frecuencia, puntos = 200) {
-    let base = generarOndaEntrada(voltajePico, frecuencia, puntos);
+function generarOndaRectificada(voltajePico, frecuencia, puntos = 200, faseOffsetRad = 0) {
+    let base = generarOndaEntrada(voltajePico, frecuencia, puntos, faseOffsetRad);
     let datos = [];
 
     for (let i = 0; i < base.datos.length; i++) {

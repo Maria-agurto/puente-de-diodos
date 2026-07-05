@@ -203,6 +203,21 @@
         notificarCambioSemiciclo('positivo');
     }
 
+    // --- Evitar que la rueda del mouse altere los <input type="number">
+    //     (comportamiento nativo del navegador: si el input está enfocado
+    //     y el usuario hace scroll sobre la página, el valor sube/baja
+    //     según el "step" del campo — por eso un 15 podía convertirse
+    //     en 15.9 al desplazarse por la página con el campo activo). ---
+    Object.values(selectores.inputs).forEach(function (sel) {
+        const el = document.querySelector(sel);
+        if (!el) return;
+        el.addEventListener('wheel', function (e) {
+            if (document.activeElement === el) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    });
+
     // --- Vincular botones según el diccionario de IDs del contrato ---
     if (btnIniciar) btnIniciar.addEventListener('click', iniciarSimulacion);
     if (btnPausar) btnPausar.addEventListener('click', pausarSimulacion);

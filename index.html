@@ -236,31 +236,31 @@
       <dl class="info-list">
         <div class="info-item">
           <dt>Frecuencia</dt>
-          <dd><span class="info-value">60.00</span> <span class="info-unit">Hz</span></dd>
+          <dd><span class="info-value" id="info-frecuencia">60.00</span> <span class="info-unit">Hz</span></dd>
         </div>
         <div class="info-item">
           <dt>Período</dt>
-          <dd><span class="info-value">16.67</span> <span class="info-unit">ms</span></dd>
+          <dd><span class="info-value" id="info-periodo">16.67</span> <span class="info-unit">ms</span></dd>
         </div>
         <div class="info-item">
           <dt>Voltaje Entrada</dt>
-          <dd><span class="info-value">12.00</span> <span class="info-unit">V</span></dd>
+          <dd><span class="info-value" id="info-voltaje-entrada">12.00</span> <span class="info-unit">V</span></dd>
         </div>
         <div class="info-item">
           <dt>Voltaje Salida</dt>
-          <dd><span class="info-value">&mdash;</span> <span class="info-unit">V</span></dd>
+          <dd><span class="info-value" id="info-voltaje-salida">&mdash;</span> <span class="info-unit">V</span></dd>
         </div>
         <div class="info-item">
           <dt>Ripple</dt>
-          <dd><span class="info-value">&mdash;</span> <span class="info-unit">%</span></dd>
+          <dd><span class="info-value" id="info-ripple">&mdash;</span> <span class="info-unit">%</span></dd>
         </div>
         <div class="info-item">
           <dt>Corriente</dt>
-          <dd><span class="info-value">&mdash;</span> <span class="info-unit">mA</span></dd>
+          <dd><span class="info-value" id="info-corriente">&mdash;</span> <span class="info-unit">mA</span></dd>
         </div>
         <div class="info-item">
           <dt>Potencia</dt>
-          <dd><span class="info-value">&mdash;</span> <span class="info-unit">W</span></dd>
+          <dd><span class="info-value" id="info-potencia">&mdash;</span> <span class="info-unit">mW</span></dd>
         </div>
       </dl>
 
@@ -282,6 +282,21 @@
   <footer class="app-footer">
     <p>Simulador de Rectificación de Onda Completa &mdash; Proyecto de Física Electrónica</p>
   </footer>
+
+  <!-- Tooltip dinámico (Integrante 3): se posiciona y llena vía JS en graphs.js -->
+  <div id="tooltip-dinamico" class="tooltip-box" role="tooltip"></div>
+
+  <!-- ============================================================
+       SCRIPTS — orden requerido:
+       1) Chart.js (librería externa para las gráficas)
+       2) calculations.js (motor matemático y estado compartido)
+       3) graphs.js (gráficas + tooltips, depende de calculations.js y Chart)
+       4) animation.js (animación DOM, depende de calculations.js y graphs.js)
+       ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="js/calculations.js"></script>
+  <script src="js/graphs.js"></script>
+  <script src="js/animation.js"></script>
 
 </body>
 </html>

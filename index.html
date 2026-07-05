@@ -123,106 +123,139 @@
              resistencia-visual. Espacio y estructura preparados para
              que el Integrante 2 aplique animation.js sobre estos nodos.
              ============================================================ -->
-        <svg viewBox="0 0 720 420" class="circuit-svg" role="img" aria-label="Diagrama esquemático del puente rectificador de onda completa">
+        <svg viewBox="0 0 800 420" class="circuit-svg" role="img" aria-label="Diagrama esquemático del puente rectificador de onda completa">
 
-          <!-- Cableado base -->
+          <!-- Fuente de CA (ícono de frecuencia): círculo con onda senoidal -->
+          <g id="fuente-ca" class="component" data-component="fuente-ca" title="Fuente de alimentación CA">
+            <circle cx="70" cy="210" r="32" class="ac-circle" />
+            <path d="M 46 210 Q 58 182 70 210 Q 82 238 94 210" class="ac-sine" />
+            <text x="70" y="256" class="label-text label-text--sub" text-anchor="middle">CA / f</text>
+          </g>
+
+          <!-- Cableado base (solo tramos rectos horizontales/verticales, sin diagonales) -->
           <g class="wiring" data-component="cableado" title="Cableado del circuito">
-            <!-- Secundario -> puente -->
-            <line x1="150" y1="120" x2="150" y2="180" class="wire" />
-            <line x1="150" y1="240" x2="150" y2="300" class="wire" />
-            <!-- Puente -> condensador -->
-            <line x1="330" y1="90" x2="430" y2="90" class="wire" />
-            <line x1="330" y1="330" x2="430" y2="330" class="wire" />
-            <line x1="430" y1="90" x2="430" y2="150" class="wire" />
-            <line x1="430" y1="270" x2="430" y2="330" class="wire" />
-            <!-- Condensador -> resistencia -->
-            <line x1="430" y1="90" x2="560" y2="90" class="wire" />
-            <line x1="430" y1="330" x2="560" y2="330" class="wire" />
-            <line x1="560" y1="90" x2="560" y2="150" class="wire" />
-            <line x1="560" y1="270" x2="560" y2="330" class="wire" />
-            <!-- Línea de salida a la derecha (para tooltip/animación de flujo) -->
-            <line x1="150" y1="90" x2="150" y2="120" class="wire" />
-            <line x1="150" y1="90" x2="330" y2="90"  class="wire" />
-            <line x1="150" y1="300" x2="150" y2="330" class="wire" />
-            <line x1="150" y1="330" x2="330" y2="330" class="wire" />
+            <!-- Fuente CA -> primario del transformador -->
+            <line x1="70"  y1="178" x2="70"  y2="150" class="wire" />
+            <line x1="70"  y1="150" x2="210" y2="150" class="wire" />
+            <line x1="70"  y1="242" x2="70"  y2="270" class="wire" />
+            <line x1="70"  y1="270" x2="210" y2="270" class="wire" />
+            <!-- Secundario del transformador -> vértices N (arriba) y S (abajo) del rombo -->
+            <line x1="300" y1="140" x2="460" y2="140" class="wire" />
+            <line x1="300" y1="280" x2="460" y2="280" class="wire" />
+            <!-- Vértice E (salida +) del rombo -> riel superior -->
+            <line x1="530" y1="210" x2="530" y2="90"  class="wire" />
+            <line x1="530" y1="90"  x2="710" y2="90"  class="wire" />
+            <!-- Vértice W (salida -) del rombo -> riel inferior -->
+            <line x1="390" y1="210" x2="390" y2="330" class="wire" />
+            <line x1="390" y1="330" x2="710" y2="330" class="wire" />
+            <!-- Derivaciones hacia condensador, resistencia y voltímetro -->
+            <line x1="590" y1="90"  x2="590" y2="195" class="wire" />
+            <line x1="590" y1="215" x2="590" y2="330" class="wire" />
+            <line x1="650" y1="90"  x2="650" y2="170" class="wire" />
+            <line x1="650" y1="218" x2="650" y2="330" class="wire" />
+            <line x1="710" y1="90"  x2="710" y2="186" class="wire" />
+            <line x1="710" y1="234" x2="710" y2="330" class="wire" />
           </g>
 
           <!-- Transformador (secundario) -->
           <g id="transformador-secundario" class="component" data-component="transformador" title="Transformador — devanado secundario">
-            <rect x="60" y="70" width="90" height="260" rx="6" class="xfmr-body" />
+            <rect x="210" y="100" width="90" height="220" rx="6" class="xfmr-body" />
             <!-- devanado primario (izquierda) -->
-            <path d="M 75 100 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20"
+            <path d="M 225 140 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20"
                   class="xfmr-coil" />
             <!-- devanado secundario (derecha) -->
-            <path d="M 135 100 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20"
+            <path d="M 285 140 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20 q -12 10 0 20 q 12 10 0 20"
                   class="xfmr-coil" />
             <!-- núcleo -->
-            <line x1="105" y1="80" x2="105" y2="320" class="xfmr-core" />
-            <line x1="112" y1="80" x2="112" y2="320" class="xfmr-core" />
-            <text x="105" y="60" class="label-text" text-anchor="middle">TRANSFORMADOR</text>
-            <text x="105" y="350" class="label-text label-text--sub" text-anchor="middle">Secundario</text>
+            <line x1="255" y1="110" x2="255" y2="310" class="xfmr-core" />
+            <line x1="262" y1="110" x2="262" y2="310" class="xfmr-core" />
+            <text x="255" y="90"  class="label-text" text-anchor="middle">TRANSFORMADOR</text>
+            <text x="255" y="340" class="label-text label-text--sub" text-anchor="middle">Secundario</text>
           </g>
 
-          <!-- Puente rectificador: 4 diodos en configuración de rombo -->
+          <!-- Puente rectificador: 4 diodos en rombo real (N/S = entrada CA
+               desde el secundario, W = salida &minus;, E = salida +), tal como
+               lo dibujó el profesor en la pizarra. Cada diodo apunta en el
+               sentido real de conducción de la corriente. -->
           <g class="bridge" data-component="puente-rectificador" title="Puente rectificador de onda completa">
 
-            <!-- Diodo 1 (superior izquierdo) -->
+            <!-- Vértices del rombo: N(460,140) S(460,280) W(390,210) E(530,210) -->
+            <circle cx="460" cy="140" r="4" class="node-dot" />
+            <circle cx="460" cy="280" r="4" class="node-dot" />
+            <circle cx="390" cy="210" r="4" class="node-dot" />
+            <circle cx="530" cy="210" r="4" class="node-dot" />
+
+            <!-- Diodo 1 — arista N-W (ánodo en W, cátodo en N) -->
             <g id="diodo-1" class="diode" data-component="diodo-1" title="Diodo 1">
-              <line x1="150" y1="180" x2="240" y2="90" class="diode-lead" />
-              <polygon points="205,150 240,150 222,120" class="diode-triangle" />
-              <line x1="205" y1="150" x2="240" y2="120" class="diode-bar-guide" />
-              <line x1="240" y1="150" x2="240" y2="120" class="diode-bar" />
-              <line x1="240" y1="90" x2="330" y2="90" class="diode-lead" />
+              <line x1="390" y1="210" x2="413.8" y2="186.2" class="diode-lead" />
+              <polygon points="423,195.4 404.6,177 430.6,169.4" class="diode-triangle" />
+              <line x1="441.2" y1="177.2" x2="422.8" y2="158.8" class="diode-bar" />
+              <line x1="432" y1="168" x2="460" y2="140" class="diode-lead" />
+              <circle cx="430.6" cy="169.4" r="9" class="diode-led" />
+              <text x="413" y="150" class="label-text label-text--diode" text-anchor="end">D1</text>
             </g>
 
-            <!-- Diodo 2 (inferior izquierdo) -->
+            <!-- Diodo 2 — arista N-E (ánodo en N, cátodo en E) -->
             <g id="diodo-2" class="diode" data-component="diodo-2" title="Diodo 2">
-              <line x1="150" y1="240" x2="240" y2="330" class="diode-lead" />
-              <polygon points="205,270 240,270 222,300" class="diode-triangle" />
-              <line x1="240" y1="270" x2="240" y2="300" class="diode-bar" />
-              <line x1="240" y1="330" x2="330" y2="330" class="diode-lead" />
+              <line x1="460" y1="140" x2="483.8" y2="163.8" class="diode-lead" />
+              <polygon points="474.6,173 493,154.6 500.6,180.6" class="diode-triangle" />
+              <line x1="492.8" y1="191.2" x2="511.2" y2="172.8" class="diode-bar" />
+              <line x1="502" y1="182" x2="530" y2="210" class="diode-lead" />
+              <circle cx="500.6" cy="180.6" r="9" class="diode-led" />
+              <text x="518" y="163" class="label-text label-text--diode" text-anchor="start">D2</text>
             </g>
 
-            <!-- Diodo 3 (inferior derecho) -->
+            <!-- Diodo 3 — arista S-W (ánodo en W, cátodo en S) -->
             <g id="diodo-3" class="diode" data-component="diodo-3" title="Diodo 3">
-              <line x1="150" y1="240" x2="240" y2="240" class="diode-lead" />
-              <polygon points="240,225 240,255 275,240" class="diode-triangle" />
-              <line x1="275" y1="225" x2="275" y2="255" class="diode-bar" />
-              <line x1="275" y1="240" x2="330" y2="240" class="diode-lead" />
+              <line x1="390" y1="210" x2="413.8" y2="233.8" class="diode-lead" />
+              <polygon points="404.6,243 423,224.6 430.6,250.6" class="diode-triangle" />
+              <line x1="422.8" y1="261.2" x2="441.2" y2="242.8" class="diode-bar" />
+              <line x1="432" y1="252" x2="460" y2="280" class="diode-lead" />
+              <circle cx="430.6" cy="250.6" r="9" class="diode-led" />
+              <text x="413" y="273" class="label-text label-text--diode" text-anchor="end">D3</text>
             </g>
 
-            <!-- Diodo 4 (superior derecho) -->
+            <!-- Diodo 4 — arista S-E (ánodo en S, cátodo en E) -->
             <g id="diodo-4" class="diode" data-component="diodo-4" title="Diodo 4">
-              <line x1="150" y1="180" x2="240" y2="180" class="diode-lead" />
-              <polygon points="240,165 240,195 275,180" class="diode-triangle" />
-              <line x1="275" y1="165" x2="275" y2="195" class="diode-bar" />
-              <line x1="275" y1="180" x2="330" y2="180" class="diode-lead" />
+              <line x1="460" y1="280" x2="483.8" y2="256.2" class="diode-lead" />
+              <polygon points="493,265.4 474.6,247 500.6,239.4" class="diode-triangle" />
+              <line x1="511.2" y1="247.2" x2="492.8" y2="228.8" class="diode-bar" />
+              <line x1="502" y1="238" x2="530" y2="210" class="diode-lead" />
+              <circle cx="500.6" cy="239.4" r="9" class="diode-led" />
+              <text x="518" y="257" class="label-text label-text--diode" text-anchor="start">D4</text>
             </g>
-
-            <text x="240" y="215" class="label-text label-text--bridge" text-anchor="middle">D1&ndash;D4</text>
           </g>
 
           <!-- Condensador -->
           <g id="condensador-visual" class="component" data-component="condensador" title="Condensador de filtrado">
-            <line x1="430" y1="150" x2="430" y2="185" class="cap-lead" />
-            <line x1="410" y1="185" x2="450" y2="185" class="cap-plate" />
-            <line x1="410" y1="200" x2="450" y2="200" class="cap-plate" />
-            <line x1="430" y1="200" x2="430" y2="270" class="cap-lead" />
-            <text x="430" y="140" class="label-text" text-anchor="middle">C</text>
+            <line x1="590" y1="150" x2="590" y2="185" class="cap-lead" />
+            <line x1="570" y1="185" x2="610" y2="185" class="cap-plate" />
+            <line x1="570" y1="200" x2="610" y2="200" class="cap-plate" />
+            <line x1="590" y1="200" x2="590" y2="270" class="cap-lead" />
+            <text x="590" y="70" class="label-text" text-anchor="middle">C</text>
           </g>
 
           <!-- Resistencia -->
           <g id="resistencia-visual" class="component" data-component="resistencia" title="Resistencia de carga">
-            <line x1="560" y1="150" x2="560" y2="170" class="res-lead" />
-            <path d="M 560 170 l 8 8 l -16 8 l 16 8 l -16 8 l 16 8 l -8 8"
+            <path d="M 650 170 l 8 8 l -16 8 l 16 8 l -16 8 l 16 8 l -8 8"
                   class="res-body" />
-            <line x1="560" y1="218" x2="560" y2="270" class="res-lead" />
-            <text x="560" y="140" class="label-text" text-anchor="middle">R</text>
+            <text x="650" y="70" class="label-text" text-anchor="middle">R</text>
           </g>
 
-          <!-- Nodos de salida (para lectura de Vout en tooltip futuro) -->
-          <circle cx="560" cy="90" r="4" class="node-dot" />
-          <circle cx="560" cy="330" r="4" class="node-dot" />
+          <!-- Voltímetro (ícono de voltaje) -->
+          <g id="voltimetro-visual" class="component" data-component="voltimetro" title="Voltímetro de salida">
+            <circle cx="710" cy="210" r="24" class="voltmeter-circle" />
+            <text x="710" y="217" class="voltmeter-text" text-anchor="middle">V</text>
+            <text x="710" y="70" class="label-text" text-anchor="middle">Vout</text>
+          </g>
+
+          <!-- Nodos de las derivaciones superiores/inferiores -->
+          <circle cx="590" cy="90"  r="4" class="node-dot" />
+          <circle cx="590" cy="330" r="4" class="node-dot" />
+          <circle cx="650" cy="90"  r="4" class="node-dot" />
+          <circle cx="650" cy="330" r="4" class="node-dot" />
+          <circle cx="710" cy="90"  r="4" class="node-dot" />
+          <circle cx="710" cy="330" r="4" class="node-dot" />
         </svg>
 
         <p class="circuit-stage__hint">El área del circuito queda reservada para las animaciones del semáforo de diodos y el flujo de corriente.</p>

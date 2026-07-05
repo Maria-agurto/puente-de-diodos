@@ -492,6 +492,45 @@ svg text {
   to   { filter: drop-shadow(0 0 10px var(--green-active)); }
 }
 
+/* --- Alternancia de polaridad del transformador (regla estricta) --- */
+.xfmr-body,
+.xfmr-coil {
+  transition: stroke 0.3s ease, filter 0.3s ease;
+}
+
+#transformador-secundario.polaridad-positiva .xfmr-body {
+  stroke: var(--blue-primary);
+  filter: drop-shadow(0 0 8px rgba(47, 111, 237, 0.65));
+}
+
+#transformador-secundario.polaridad-positiva .xfmr-coil {
+  stroke: var(--blue-primary);
+}
+
+#transformador-secundario.polaridad-negativa .xfmr-body {
+  stroke: #f97316;
+  filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.65));
+}
+
+#transformador-secundario.polaridad-negativa .xfmr-coil {
+  stroke: #f97316;
+}
+
+/* --- Condensador cargando (semiciclo positivo) --- */
+#condensador-visual.condensador-cargando .cap-plate {
+  stroke: var(--green-active);
+  filter: drop-shadow(0 0 6px var(--green-active));
+  transition: stroke 0.3s ease, filter 0.3s ease;
+}
+
+/* --- Flujo de corriente activo sobre la resistencia de carga --- */
+#resistencia-visual.flujo-activo .res-body,
+#resistencia-visual.flujo-activo .res-lead {
+  stroke: var(--green-active);
+  filter: drop-shadow(0 0 5px var(--green-active));
+  animation: diodo-pulso 1s ease-in-out infinite alternate;
+}
+
 
 /* ================================================================
    8. PANEL DERECHO — Información del sistema
@@ -609,11 +648,47 @@ svg text {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .diodo-activo .diode-triangle {
+  .diodo-activo .diode-triangle,
+  #resistencia-visual.flujo-activo .res-body {
     animation: none;
   }
   .panel,
   .btn {
     transition: none;
   }
+}
+
+
+/* ================================================================
+   11. TOOLTIP DINÁMICO — Integrante 3 (hover sobre componentes)
+   ================================================================ */
+
+.tooltip-box {
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background: rgba(11, 18, 32, 0.95);
+  color: var(--white);
+  border: 1px solid var(--blue-primary);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  box-shadow: var(--shadow-panel-hover);
+  transform: translate(14px, 14px);
+  transition: opacity 0.12s ease;
+  opacity: 0;
+  white-space: nowrap;
+}
+
+.tooltip-box.visible {
+  opacity: 1;
+}
+
+.tooltip-box strong {
+  color: #9fd6ff;
+  font-family: var(--font-display);
 }

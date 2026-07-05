@@ -161,6 +161,14 @@
 
     function iniciarSimulacion() {
         if (EstadoSimulacion.corriendo) return;
+
+        // Integración: leer los valores actuales de los inputs y
+        // redibujar la gráfica/panel con esos valores antes de animar.
+        leerValoresUsuario();
+        if (window.GraficasSimulador) {
+            window.GraficasSimulador.iniciar(EstadoSimulacion);
+        }
+
         EstadoSimulacion.corriendo = true;
         ultimoTimestamp = null;
         animarFlujoCorriente(true);
@@ -182,6 +190,13 @@
         EstadoSimulacion.tiempoTranscurridoVisual = 0;
         ultimoTimestamp = null;
 
+        // Integración: releer inputs (por si el usuario los cambió) y
+        // redibujar la gráfica desde cero, sincronizada al inicio del ciclo.
+        leerValoresUsuario();
+        if (window.GraficasSimulador) {
+            window.GraficasSimulador.iniciar(EstadoSimulacion);
+        }
+
         encenderDiodos('positivo');
         animarSecundario('positivo');
         animarCondensador('positivo');
@@ -197,6 +212,13 @@
     document.addEventListener('DOMContentLoaded', function () {
         encenderDiodos(EstadoSimulacion.semicicloActual || 'positivo');
         animarSecundario(EstadoSimulacion.semicicloActual || 'positivo');
+
+        // Pre-cargar la gráfica y el panel de información con los
+        // valores por defecto de los inputs, para que no se vean vacíos.
+        leerValoresUsuario();
+        if (window.GraficasSimulador) {
+            window.GraficasSimulador.iniciar(EstadoSimulacion);
+        }
     });
 
     // --- API expuesta para depuración o uso desde otros módulos ---

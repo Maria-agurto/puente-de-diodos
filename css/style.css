@@ -1,1 +1,744 @@
-df
+/* ================================================================
+   SIMULADOR DE RECTIFICACIÓN — style.css
+   Integrante 1 (UI/UX) — Solo estructura visual, sin lógica.
+
+   Identidad visual: "banco de laboratorio digital". El panel del
+   circuito imita la pantalla de un osciloscopio (fondo casi negro,
+   rejilla de puntos, trazos tipo pista de PCB) mientras los paneles
+   de control y datos usan un gris-azulado claro tipo carcasa de
+   instrumento. El verde es exclusivo para estados activos.
+   ================================================================ */
+
+
+/* ================================================================
+   1. VARIABLES
+   ================================================================ */
+:root {
+  /* Color — nombres y valores */
+  --bg-app:        #eef1f6;   /* fondo general de la página */
+  --bg-deep:       #0b1220;   /* pantalla del osciloscopio / circuito */
+  --bg-deep-alt:   #131c2e;   /* variante para bordes internos del circuito */
+  --panel:         #ffffff;   /* superficie de tarjetas/paneles */
+  --panel-edge:    #d7dde8;   /* bordes sutiles de panel */
+  --blue-primary:  #2f6fed;   /* azul de acción / foco */
+  --blue-deep:     #16305e;   /* azul oscuro del header y textos técnicos */
+  --blue-trace:    #3d7bff;   /* azul de pistas/cableado sobre fondo oscuro */
+  --gray-steel:    #64748b;   /* texto secundario */
+  --gray-line:     #aab4c4;   /* líneas neutras sobre fondo oscuro */
+  --green-active:  #22ff88;   /* estado activo (diodo-activo) */
+  --green-deep:    #0f9d58;   /* verde de soporte para botón iniciar */
+  --led-on:        #ef4444;   /* LED de diodo conduciendo (rojo) */
+  --led-off:       #3b82f6;   /* LED de diodo en corte (azul) */
+  --white:         #ffffff;
+  --ink:           #0f1729;   /* texto principal */
+
+  /* Tipografía */
+  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body:    'Inter', 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Consolas', monospace;
+
+  /* Layout */
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-panel: 0 1px 2px rgba(15, 23, 41, 0.04), 0 10px 24px -12px rgba(15, 23, 41, 0.18);
+  --shadow-panel-hover: 0 1px 2px rgba(15, 23, 41, 0.06), 0 16px 32px -14px rgba(15, 23, 41, 0.24);
+  --gap-lg: 24px;
+  --gap-md: 16px;
+}
+
+
+/* ================================================================
+   2. RESET
+   ================================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-app);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p, dl, dd {
+  margin: 0;
+}
+
+ul, ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--blue-primary);
+  outline-offset: 2px;
+}
+
+svg text {
+  font-family: var(--font-mono);
+  user-select: none;
+}
+
+
+/* ================================================================
+   3. LAYOUT
+   ================================================================ */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-lg);
+  padding: 22px clamp(16px, 4vw, 48px);
+  background: linear-gradient(135deg, var(--blue-deep) 0%, #0d1e3d 100%);
+  color: var(--white);
+  border-bottom: 3px solid var(--blue-primary);
+}
+
+.app-header__eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9fb4e0;
+  margin-bottom: 6px;
+}
+
+.app-header__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.3rem, 2.4vw, 1.85rem);
+  letter-spacing: 0.01em;
+}
+
+.app-header__subtitle {
+  margin-top: 6px;
+  font-size: 0.92rem;
+  color: #c3cfe6;
+}
+
+.app-header__status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: #c3cfe6;
+  white-space: nowrap;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gray-line);
+  box-shadow: 0 0 0 3px rgba(170, 180, 196, 0.15);
+}
+
+.workbench {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 300px;
+  gap: var(--gap-lg);
+  padding: var(--gap-lg) clamp(16px, 4vw, 48px);
+  align-items: start;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+  padding: 22px;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.panel:hover {
+  box-shadow: var(--shadow-panel-hover);
+}
+
+.panel__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--blue-deep);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--panel-edge);
+}
+
+.panel__index {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--white);
+  background: var(--blue-primary);
+  padding: 3px 7px;
+  border-radius: 5px;
+}
+
+.graph-panel {
+  margin: 0 clamp(16px, 4vw, 48px) var(--gap-lg);
+}
+
+.app-footer {
+  text-align: center;
+  padding: 18px;
+  font-size: 0.82rem;
+  color: var(--gray-steel);
+}
+
+
+/* ================================================================
+   4. PANEL IZQUIERDO — Controles
+   ================================================================ */
+
+.controls-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.field__unit {
+  font-weight: 400;
+  color: var(--gray-steel);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.field input[type="number"] {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--panel-edge);
+  background: #f8fafc;
+  color: var(--ink);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.field input[type="number"]:hover {
+  border-color: #b7c3d6;
+}
+
+.field input[type="number"]:focus {
+  border-color: var(--blue-primary);
+  background: var(--white);
+  outline: none;
+}
+
+/* Ocultar flechas nativas para una lectura más limpia tipo instrumento */
+.field input[type="number"]::-webkit-inner-spin-button,
+.field input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.6;
+}
+
+
+/* ================================================================
+   5. BOTONES
+   ================================================================ */
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid transparent;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn__icon {
+  font-size: 0.85em;
+  line-height: 1;
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, var(--green-deep), #12b869);
+  color: var(--white);
+  box-shadow: 0 8px 18px -8px rgba(15, 157, 88, 0.55);
+}
+
+.btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px -8px rgba(15, 157, 88, 0.6);
+}
+
+.btn--secondary {
+  background: var(--white);
+  color: var(--blue-deep);
+  border-color: var(--panel-edge);
+}
+
+.btn--secondary:hover {
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+  transform: translateY(-1px);
+}
+
+.btn--ghost {
+  background: #f1f4f9;
+  color: var(--gray-steel);
+  border-color: transparent;
+}
+
+.btn--ghost:hover {
+  background: #e6ebf3;
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+
+/* ================================================================
+   6. CIRCUITO (panel central)
+   ================================================================ */
+
+.circuit-panel {
+  min-width: 0;
+}
+
+.circuit-stage {
+  background: radial-gradient(circle at 20% 15%, var(--bg-deep-alt), var(--bg-deep) 65%);
+  border-radius: var(--radius-md);
+  border: 1px solid #1d2a44;
+  padding: 18px;
+  /* Rejilla de puntos estilo osciloscopio */
+  background-image:
+    radial-gradient(circle, rgba(61, 123, 255, 0.16) 1px, transparent 1px),
+    radial-gradient(circle at 20% 15%, var(--bg-deep-alt), var(--bg-deep) 65%);
+  background-size: 22px 22px, 100% 100%;
+}
+
+.circuit-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.circuit-stage__hint {
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: #7f8db3;
+  text-align: center;
+  font-style: italic;
+}
+
+
+/* ================================================================
+   7. SVG — estilos de los componentes del circuito
+   ================================================================ */
+
+.wire {
+  stroke: var(--blue-trace);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.xfmr-body {
+  fill: rgba(61, 123, 255, 0.06);
+  stroke: var(--gray-line);
+  stroke-width: 1.5;
+}
+
+.xfmr-coil {
+  fill: none;
+  stroke: var(--blue-trace);
+  stroke-width: 2.5;
+}
+
+.xfmr-core {
+  stroke: var(--blue-trace);
+  stroke-width: 3;
+}
+
+/* --- Fuente de CA: círculo + onda senoidal (ícono de frecuencia) --- */
+.ac-circle {
+  fill: rgba(61, 123, 255, 0.06);
+  stroke: var(--blue-trace);
+  stroke-width: 2;
+}
+
+.ac-sine {
+  fill: none;
+  stroke: var(--blue-trace);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+/* --- Voltímetro: círculo + "V" (ícono de voltaje) --- */
+.voltmeter-circle {
+  fill: rgba(61, 123, 255, 0.06);
+  stroke: var(--blue-trace);
+  stroke-width: 2;
+}
+
+.voltmeter-text {
+  fill: var(--blue-trace);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.diode-lead {
+  stroke: var(--blue-trace);
+  stroke-width: 2.5;
+}
+
+.diode-triangle {
+  fill: rgba(61, 123, 255, 0.14);
+  stroke: var(--blue-trace);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  transition: fill 0.3s ease, stroke 0.3s ease;
+}
+
+.diode-bar {
+  stroke: var(--blue-trace);
+  stroke-width: 2.5;
+}
+
+.cap-lead,
+.res-lead {
+  stroke: var(--blue-trace);
+  stroke-width: 2.5;
+}
+
+.cap-plate {
+  stroke: var(--blue-trace);
+  stroke-width: 3.5;
+}
+
+.res-body {
+  fill: none;
+  stroke: var(--blue-trace);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.node-dot {
+  fill: var(--blue-trace);
+}
+
+.label-text {
+  fill: #c3cfe6;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.label-text--sub {
+  fill: #7f8db3;
+  font-size: 9px;
+}
+
+.label-text--bridge {
+  fill: #7f8db3;
+  font-size: 10px;
+}
+
+.label-text--diode {
+  fill: #dbe4f5;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* --- LED indicador de cada diodo: azul = en corte, rojo = conduciendo --- */
+.diode-led {
+  fill: var(--led-off);
+  stroke: #0b1220;
+  stroke-width: 1.5;
+  transition: fill 0.25s ease, filter 0.25s ease;
+}
+
+/* Componentes reciben un leve realce al pasar el cursor,
+   anticipando los tooltips que integrará el Integrante 3 */
+.component:hover .diode-triangle,
+.component:hover .xfmr-body {
+  stroke: var(--blue-primary);
+}
+
+.diode:hover .diode-triangle {
+  stroke: var(--blue-primary);
+}
+
+
+/* ================================================================
+   ANIMACIONES — clase reservada para animation.js (Integrante 2)
+   No se aplica automáticamente en ningún elemento.
+   ================================================================ */
+
+.diodo-activo .diode-triangle {
+  fill: var(--led-on);
+  stroke: var(--led-on);
+  filter: drop-shadow(0 0 6px var(--led-on));
+  animation: diodo-pulso 1s ease-in-out infinite alternate;
+}
+
+.diodo-activo .diode-bar {
+  stroke: var(--led-on);
+  filter: drop-shadow(0 0 4px var(--led-on));
+}
+
+.diodo-activo .diode-led {
+  fill: var(--led-on);
+  filter: drop-shadow(0 0 8px var(--led-on));
+  animation: diodo-pulso 1s ease-in-out infinite alternate;
+}
+
+@keyframes diodo-pulso {
+  from { filter: drop-shadow(0 0 4px var(--led-on)); }
+  to   { filter: drop-shadow(0 0 10px var(--led-on)); }
+}
+
+/* --- Alternancia de polaridad del transformador (regla estricta) --- */
+.xfmr-body,
+.xfmr-coil {
+  transition: stroke 0.3s ease, filter 0.3s ease;
+}
+
+#transformador-secundario.polaridad-positiva .xfmr-body {
+  stroke: var(--blue-primary);
+  filter: drop-shadow(0 0 8px rgba(47, 111, 237, 0.65));
+}
+
+#transformador-secundario.polaridad-positiva .xfmr-coil {
+  stroke: var(--blue-primary);
+}
+
+#transformador-secundario.polaridad-negativa .xfmr-body {
+  stroke: #f97316;
+  filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.65));
+}
+
+#transformador-secundario.polaridad-negativa .xfmr-coil {
+  stroke: #f97316;
+}
+
+/* --- Condensador cargando (semiciclo positivo) --- */
+#condensador-visual.condensador-cargando .cap-plate {
+  stroke: var(--green-active);
+  filter: drop-shadow(0 0 6px var(--green-active));
+  transition: stroke 0.3s ease, filter 0.3s ease;
+}
+
+/* --- Flujo de corriente activo sobre la resistencia de carga --- */
+#resistencia-visual.flujo-activo .res-body,
+#resistencia-visual.flujo-activo .res-lead {
+  stroke: var(--green-active);
+  filter: drop-shadow(0 0 5px var(--green-active));
+  animation: flujo-pulso 1s ease-in-out infinite alternate;
+}
+
+@keyframes flujo-pulso {
+  from { filter: drop-shadow(0 0 4px var(--green-active)); }
+  to   { filter: drop-shadow(0 0 10px var(--green-active)); }
+}
+
+
+/* ================================================================
+   8. PANEL DERECHO — Información del sistema
+   ================================================================ */
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--panel-edge);
+  border-radius: var(--radius-md);
+}
+
+.info-item dt {
+  font-size: 0.82rem;
+  color: var(--gray-steel);
+  font-weight: 500;
+}
+
+.info-item dd {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--blue-deep);
+}
+
+.info-unit {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--gray-steel);
+  margin-left: 3px;
+}
+
+.info-panel__hint {
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--gray-steel);
+  font-style: italic;
+}
+
+
+/* ================================================================
+   9. GRÁFICA — reserva para Chart.js
+   ================================================================ */
+
+.graph-canvas-wrapper {
+  background: radial-gradient(circle at 20% 15%, var(--bg-deep-alt), var(--bg-deep) 65%);
+  border-radius: var(--radius-md);
+  border: 1px solid #1d2a44;
+  padding: 12px;
+  min-height: 220px;
+  display: flex;
+  align-items: stretch;
+}
+
+#grafica-ondas {
+  width: 100%;
+  min-height: 200px;
+}
+
+
+/* ================================================================
+   10. RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 1080px) {
+  .workbench {
+    grid-template-columns: 260px minmax(0, 1fr) 260px;
+  }
+}
+
+@media (max-width: 860px) {
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .controls-panel,
+  .info-panel,
+  .circuit-panel {
+    width: 100%;
+  }
+
+  .circuit-panel {
+    order: -1; /* el circuito queda centrado y visible primero */
+  }
+}
+
+@media (max-width: 560px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diodo-activo .diode-triangle,
+  .diodo-activo .diode-led,
+  #resistencia-visual.flujo-activo .res-body {
+    animation: none;
+  }
+  .panel,
+  .btn {
+    transition: none;
+  }
+}
+
+
+/* ================================================================
+   11. TOOLTIP DINÁMICO — Integrante 3 (hover sobre componentes)
+   ================================================================ */
+
+.tooltip-box {
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background: rgba(11, 18, 32, 0.95);
+  color: var(--white);
+  border: 1px solid var(--blue-primary);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  box-shadow: var(--shadow-panel-hover);
+  transform: translate(14px, 14px);
+  transition: opacity 0.12s ease;
+  opacity: 0;
+  white-space: nowrap;
+}
+
+.tooltip-box.visible {
+  opacity: 1;
+}
+
+.tooltip-box strong {
+  color: #9fd6ff;
+  font-family: var(--font-display);
+}
